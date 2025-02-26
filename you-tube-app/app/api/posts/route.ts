@@ -3,11 +3,12 @@ export const GET = async () => {
         const response = await fetch('https://dummyjson.com/posts');
         const data = await response.json();
 
-        console.log(data);
-
         return new Response(JSON.stringify(data), {
             status: 200,
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 's-maxage=60, stale-while-revalidate=300',
+            },
         });
     } catch (error) {
         console.error('Fetch error:', error);

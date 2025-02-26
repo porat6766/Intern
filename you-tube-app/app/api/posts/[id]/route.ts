@@ -10,7 +10,12 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
         const data = await response.json();
         console.log("Fetched Post:", data);
 
-        return NextResponse.json(data, { status: 200 });
+        return NextResponse.json(data, {
+            status: 200,
+            headers: {
+                "Cache-Control": "s-maxage=60, stale-while-revalidate=300",
+            },
+        });
     } catch (error) {
         console.error("Fetch error:", error);
         return NextResponse.json({ error: "Failed to fetch post" }, { status: 500 });
