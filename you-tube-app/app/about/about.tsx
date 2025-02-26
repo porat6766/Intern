@@ -13,7 +13,6 @@ const About = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 flex flex-col items-center">
-            {/* Hero Section with Parallax Effect */}
             <div className="relative w-full h-96 overflow-hidden">
                 <div
                     className="absolute inset-0 bg-cover bg-center"

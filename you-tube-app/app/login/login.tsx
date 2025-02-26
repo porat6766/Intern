@@ -10,17 +10,35 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
-        setError('');
+        setError("");
 
         if (!email || !password) {
-            setError('Please fill in all fields');
+            setError("Please fill in all fields");
             return;
         }
 
-        console.log('Logging in with:', { email, password });
+        try {
+            const response = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Login failed");
+            }
+
+            console.log("Login successful:", data);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
     };
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
