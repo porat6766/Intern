@@ -7,7 +7,7 @@ import { Post } from "@/app/types/postType";
 
 
 const PostPage = () => {
-    const { id } = useParams(); // מקבל את ה-ID מה-URL
+    const { id } = useParams();
     const [post, setPost] = useState<Post | null>(null);
     const [loading, setLoading] = useState(true);
 
