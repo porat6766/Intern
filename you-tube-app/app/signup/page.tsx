@@ -14,7 +14,7 @@ const SignUpPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prevData => ({
       ...prevData,
@@ -22,13 +22,11 @@ const SignUpPage = () => {
     }));
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Clear previous messages
     setError('');
     setSuccess(false);
 
-    // Basic validation
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       setError('Please fill in all required fields');
       return;
@@ -44,22 +42,28 @@ const SignUpPage = () => {
       return;
     }
 
-    // Here you would typically call your registration API
-    console.log('Registering with:', formData);
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    // Simulate successful registration
-    setSuccess(true);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Something went wrong');
+      }
 
-    // Example registration logic (replace with actual API call)
-    // registerUser(formData)
-    //   .then(response => {
-    //     setSuccess(true);
-    //     // Redirect after successful registration or show success message
-    //   })
-    //   .catch(err => {
-    //     setError(err.message);
-    //   });
+      setSuccess(true);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
+    }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

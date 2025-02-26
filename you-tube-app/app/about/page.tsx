@@ -57,7 +57,7 @@ const About = () => {
                 >
                     <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Our Mission</h2>
                     <blockquote className="border-l-4 border-blue-500 pl-6 py-2 italic text-gray-600 text-lg">
-                        "To inspire progress and deliver unparalleled value through innovation, integrity, and collaboration."
+                        To inspire progress and deliver unparalleled value through innovation, integrity, and collaboration.
                     </blockquote>
                     <p className="text-lg text-gray-700 leading-relaxed mt-4">
                         We believe in building lasting relationships with our clients, fostering a culture of trust, and driving
@@ -122,7 +122,7 @@ const About = () => {
                                 ))}
                             </div>
                             <p className="text-gray-700 mb-4">
-                                "Horizon Solutions transformed our business with their innovative approach. Highly recommended!"
+                                Horizon Solutions transformed our business with their innovative approach. Highly recommended!
                             </p>
                             <p className="font-bold text-gray-900">James Carter - CEO, BrightFuture Inc.</p>
                         </div>
@@ -137,7 +137,7 @@ const About = () => {
                                 ))}
                             </div>
                             <p className="text-gray-700 mb-4">
-                                "Their team’s dedication and expertise are unmatched. A true partner in our success."
+                                Their team’s dedication and expertise are unmatched. A true partner in our success.
                             </p>
                             <p className="font-bold text-gray-900">Linda Patel - Operations Manager, TechTrend</p>
                         </div>
@@ -152,7 +152,7 @@ const About = () => {
                                 ))}
                             </div>
                             <p className="text-gray-700 mb-4">
-                                "Exceptional service and support. They’ve exceeded our expectations every time."
+                                Exceptional service and support. They’ve exceeded our expectations every time.
                             </p>
                             <p className="font-bold text-gray-900">David Kim - Director, Innovate Solutions</p>
                         </div>

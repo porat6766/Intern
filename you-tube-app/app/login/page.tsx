@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -10,7 +11,9 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = async (e: any) => {
+    const router = useRouter()
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError("");
 
@@ -33,9 +36,11 @@ const LoginPage = () => {
             }
 
             console.log("Login successful:", data);
-
-        } catch (error: any) {
-            setError(error.message);
+            router.push("/posts")
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
         }
     };
 

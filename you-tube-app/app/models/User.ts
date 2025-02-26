@@ -1,16 +1,8 @@
-
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
+import { IUser } from "../types/userType";
 
-export interface IUser extends Document {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    createdAt: Date;
-}
 
-// יצירת סכמת המשתמש
 const UserSchema: Schema = new Schema({
     firstName: { type: String, required: true, trim: true },
     lastName: { type: String, required: true, trim: true },
@@ -19,12 +11,12 @@ const UserSchema: Schema = new Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-// הצפנת הסיסמה לפני שמירת המשתמש במסד הנתונים
 UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await bcrypt.hash(this.password as string, salt)
     next();
 });
 
-export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+const User = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+export default User;

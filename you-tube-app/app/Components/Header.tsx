@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 const Header = () => {
     return (
@@ -8,24 +9,24 @@ const Header = () => {
                 <nav>
                     <ul className="flex space-x-4">
                         <li>
-                            <a href="/login" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white transition-colors">
+                            <Link href="/login" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white transition-colors">
                                 Login
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="/signup" className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white transition-colors">
+                            <Link href="/signup" className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white transition-colors">
                                 SignUp
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="/about" className="px-4 py-2 hover:bg-gray-700 rounded transition-colors">
+                            <Link href="/about" className="px-4 py-2 hover:bg-gray-700 rounded transition-colors">
                                 About
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="/posts" className="px-4 py-2 hover:bg-gray-700 rounded transition-colors">
+                            <Link href="/posts" className="px-4 py-2 hover:bg-gray-700 rounded transition-colors">
                                 Posts
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                 </nav>
