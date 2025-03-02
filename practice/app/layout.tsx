@@ -29,7 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <header className="w-full text-3xl bg-red-400">
-          <Link href="/dashboard/users">Users    ; i am global header</Link>
+          <Link href="/dashboard/movies">Movies    ; i am global header</Link>
         </header>
         {children}
       </body>
