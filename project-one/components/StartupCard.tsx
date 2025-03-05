@@ -2,13 +2,17 @@ import { formatDate } from '@/lib/utils';
 import React from 'react';
 import { EyeIcon } from "lucide-react"
 import Link from 'next/link';
+import Image from 'next/image';
+import { Button } from './ui/button';
 export interface Post {
     _createdAt: string;
     views: number;
     author: { id: number, name: string };
     _id: number;
     description: string;
+    category: string
     image: string;
+    title: string;
 }
 
 interface StartupCardProps {
@@ -16,25 +20,67 @@ interface StartupCardProps {
 }
 
 const StartupCard: React.FC<StartupCardProps> = ({ post }) => {
+    const { _createdAt,
+        views,
+        author: { id, name },
+        _id,
+        title,
+        description,
+        image,
+        category
+    } = post
     return (
         <li className='startup-card group'>
             <div className='flex-between'>
                 <p className='startup-card_date'>
-                    {formatDate(post._createdAt)}
+                    {formatDate(_createdAt)}
                 </p>
                 <div className='flex gap-1.55'>
                     <EyeIcon className="size-6 text-primary" />
-                    <span className='text-16-medium'>{post.views}</span>
+                    <span className='text-16-medium'>{views}</span>
                 </div>
             </div>
             <div className='flex-between mt-5 gap-5'>
                 <div className='flex-1'>
-                    <Link href={`/user/${post.author?.id}`}></Link>
-                    <p className='text-16-medium line-clamp-1'>
-                        {post.author?.name}
-                    </p>
+                    <Link href={`/user/${id}`}>
+                        <p className='text-16-medium line-clamp-1'>
+                            {name}
+                        </p>
+                    </Link>
+                    <Link href={`/startup/${_id}`}>
+                        <h3 className='text-26-semibold'>
+                            {title}
+                        </h3>
+                    </Link>
+
                 </div>
+
+                <Link href={`/user/${id}`}>
+                    <Image className='rounded-full' src="http://placehold.co/600x400" alt="placeholder" width={48} height={48} />
+                </Link>
+
             </div>
+
+            <Link href={`/startup/${_id}`}>
+                <p className='startup-card_desc'>
+                    {description}
+                </p>
+                <img src={image} alt="placeholder" className='startup-card_img' />
+            </Link>
+
+            <div className='flex-between gap-3 mt-5'>
+                <Link href={`/?query=${category.toLowerCase()}`}>
+                    <p className='text-16-medium'>
+                        {category}
+                    </p>
+                </Link>
+                <Button className='startup-card_btn' asChild>
+                    <Link href={`/startup/${_id}`}>
+                        Details
+                    </Link>
+                </Button>
+            </div>
+
         </li>
     );
 };
