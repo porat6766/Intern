@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { UserService } from "../../services/UserService";
+import { UserService } from "../../../AppConfig/Services/UserService";
 
 export async function POST(req: Request) {
     try {

@@ -1,6 +1,6 @@
 import React from 'react';
-import Hero from '../components/Hero';
-import Features from '../components/Features';
+import Hero from '../AppConfig/components/Hero';
+import Features from '../AppConfig/components/Features';
 
 const Home = () => {
   return (

@@ -3,11 +3,13 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "../../AppConfig/components/ui/input";
+import { Button } from "../../AppConfig/components/ui/button";
+import { Card } from "../../AppConfig/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "../../AppConfig/components/ui/card";
 import { useRouter } from "next/navigation";
-import { IUserLogin } from "../Types/User";
+import useUserStore from "../../AppConfig/Store/userZustand";
+import { useEffect } from "react";
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -16,19 +18,49 @@ const loginSchema = z.object({
 
 const Login = () => {
     const router = useRouter();
+    const { user } = useUserStore();
+
 
     const {
         register,
         handleSubmit,
         formState: { errors },
+        reset
     } = useForm({
         resolver: zodResolver(loginSchema),
     });
+    useEffect(() => {
+        if (user) {
+            router.push("/tasks");
+        }
+    }, [user, router]);
 
-    const onSubmit = (data: IUserLogin) => {
+    const onSubmit = async (data: { email: string; password: string }) => {
         console.log("Login Data:", data);
-        // Add your login logic here
+
+        try {
+            const res = await fetch("api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!res.ok) {
+                throw new Error("Invalid credentials");
+            }
+
+            const responseData = await res.json();
+            localStorage.setItem("token", responseData.token);
+            console.log("Login Successful:", responseData);
+            reset();
+            router.push("/tasks");
+        } catch (error) {
+            console.error("Error logging in:", error);
+        }
     };
+
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100">

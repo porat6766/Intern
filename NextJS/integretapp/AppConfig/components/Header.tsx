@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button";
 import { User, ListChecks, PlusCircle } from "lucide-react";
-import useUserStore from "@/app/store/userZustand";
+import useUserStore from "@/AppConfig/Store/userZustand";
 import { useRouter } from "next/navigation";
 
 const Header = () => {
@@ -33,7 +33,7 @@ const Header = () => {
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-1 transition-all hover:bg-green-50"
-                        onClick={() => router.push("/add-task")}
+                        onClick={() => router.push("/addTask")}
                     >
                         <PlusCircle className="w-4 h-4 mr-1" />
                         <span className="hidden sm:inline">Add Task</span>

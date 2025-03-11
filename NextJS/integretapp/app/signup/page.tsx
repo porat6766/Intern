@@ -3,12 +3,13 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IUserSignUp } from "../Types/User";
-import useUserStore from "../store/userZustand";
+import { Input } from "../../AppConfig/components/ui/input";
+import { Button } from "../../AppConfig/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../../AppConfig/components/ui/card";
+import { IUserSignUp } from "../../AppConfig/Types/User";
+import useUserStore from "../../AppConfig/Store/userZustand";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const signupSchema = z.object({
     username: z.string().min(3, "Username must be at least 3 characters long"),
@@ -20,9 +21,11 @@ const Signup = () => {
     const router = useRouter()
     const { setUser, user } = useUserStore();
 
-    if (user) {
-        router.push("/tasks")
-    }
+    useEffect(() => {
+        if (user) {
+            router.push("/tasks");
+        }
+    }, [user, router]);
 
     const {
         register,
