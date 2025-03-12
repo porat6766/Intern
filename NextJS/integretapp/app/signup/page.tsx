@@ -6,10 +6,10 @@ import * as z from "zod";
 import { Input } from "../../AppConfig/components/ui/input";
 import { Button } from "../../AppConfig/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../AppConfig/components/ui/card";
-import { IUserSignUp } from "../../AppConfig/Types/User";
-import useUserStore from "../../AppConfig/Store/userZustand";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import useUserStore from "../../AppConfig/Store/userZustand";
+import { useEffect, useActionState } from "react";
+import { signupAction } from "../../AppConfig/actions/auth";
 
 const signupSchema = z.object({
     username: z.string().min(3, "Username must be at least 3 characters long"),
@@ -17,48 +17,26 @@ const signupSchema = z.object({
     password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
-const Signup = () => {
-    const router = useRouter()
-    const { setUser, user } = useUserStore();
-
-    useEffect(() => {
-        if (user) {
-            router.push("/tasks");
-        }
-    }, [user, router]);
+const SignUp = () => {
+    const router = useRouter();
+    const { setUser } = useUserStore();
+    const [state, formAction] = useActionState(signupAction, {});
 
     const {
         register,
         handleSubmit,
         formState: { errors },
-        reset
-    } = useForm({
-        resolver: zodResolver(signupSchema),
-    });
+    } = useForm({ resolver: zodResolver(signupSchema) });
 
-    const onSubmit = async (data: IUserSignUp) => {
-        console.log("Signup Data:", data);
-
-        try {
-            const res = await fetch("api/signup", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (!res.ok) {
-                throw new Error("Signup failed");
-            }
-
-            const responseData = await res.json();
-            setUser(responseData.user)
-            console.log("Signup Successful:", responseData);
-            reset()
-        } catch (error) {
-            console.error("Error signing up:", error);
+    useEffect(() => {
+        if (state.user) {
+            setUser(state.user);
+            router.push("/tasks");
         }
+    }, [state.user, router, setUser]);
+
+    const onSubmit = (data: any) => {
+        formAction(data);
     };
 
     return (
@@ -75,7 +53,9 @@ const Signup = () => {
                                 placeholder="Username"
                                 {...register("username")}
                             />
-                            {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+                            {errors.username && (
+                                <p className="text-red-500 text-sm">{errors.username.message}</p>
+                            )}
                         </div>
                         <div>
                             <Input
@@ -83,7 +63,9 @@ const Signup = () => {
                                 placeholder="Email"
                                 {...register("email")}
                             />
-                            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+                            {errors.email && (
+                                <p className="text-red-500 text-sm">{errors.email.message}</p>
+                            )}
                         </div>
                         <div>
                             <Input
@@ -91,9 +73,27 @@ const Signup = () => {
                                 placeholder="Password"
                                 {...register("password")}
                             />
-                            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+                            {errors.password && (
+                                <p className="text-red-500 text-sm">{errors.password.message}</p>
+                            )}
                         </div>
-                        <Button type="submit" className="w-full">Sign Up</Button>
+                        {state.error && <p className="text-red-500 text-sm">{state.error}</p>}
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={state.isLoading}
+                        >
+                            {state.isLoading ? "Signing Up..." : "Sign Up"}
+                        </Button>
+                        <p className="text-center mt-4 text-sm">
+                            Already have an account?{" "}
+                            <span
+                                onClick={() => router.push("/login")}
+                                className="text-blue-500 cursor-pointer"
+                            >
+                                Login here
+                            </span>
+                        </p>
                     </form>
                 </CardContent>
             </Card>
@@ -101,4 +101,4 @@ const Signup = () => {
     );
 };
 
-export default Signup;
+export default SignUp;

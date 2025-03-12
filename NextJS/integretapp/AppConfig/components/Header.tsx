@@ -1,13 +1,33 @@
-"use client";
+'use client'
 
 import { Button } from "../components/ui/button";
 import { User, ListChecks, PlusCircle } from "lucide-react";
 import useUserStore from "@/AppConfig/Store/userZustand";
 import { useRouter } from "next/navigation";
+import { useActionState } from "react";
+import { logoutAction } from "../actions/auth";
+import { startTransition } from "react";
+
+const initialState = {
+    message: null,
+    error: "",
+    loading: false,
+};
 
 const Header = () => {
-    const { user } = useUserStore();
+    const { user, setUser } = useUserStore();  // ensure you have setUser in your store
     const router = useRouter();
+
+    const [state, performLogout] = useActionState(logoutAction, initialState);
+
+    const handleLogout = async () => {
+        startTransition(() => {
+            performLogout();
+            localStorage.removeItem("user-storage");
+            setUser(null);  // Reset user in Zustand store
+            window.location.reload();
+        });
+    };
 
     return (
         <header className="w-full py-4 px-6 bg-white shadow-sm border-b border-slate-200 animate-fade-in">
@@ -40,9 +60,20 @@ const Header = () => {
                     </Button>
 
                     {user ? (
-                        <div className="text-black cursor-pointer" onClick={() => router.push("/profile")}>
-                            {user.username}
-                        </div>
+                        <>
+                            <div className="text-black cursor-pointer" onClick={() => router.push("/profile")}>
+                                {user.username}
+                            </div>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                className="bg-red-600 hover:bg-red-700 flex items-center gap-1"
+                                onClick={handleLogout}
+                            >
+                                <User className="w-4 h-4 mr-1" />
+                                <span className="hidden sm:inline">Logout</span>
+                            </Button>
+                        </>
                     ) : (
                         <Button
                             variant="default"
@@ -55,6 +86,10 @@ const Header = () => {
                         </Button>
                     )}
                 </nav>
+
+                {/* Display Loading and Error State */}
+                {state.loading && <div>Logging out...</div>}
+                {state.error && <div className="text-red-500">{state.error}</div>}
             </div>
         </header>
     );

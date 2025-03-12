@@ -4,14 +4,14 @@ import { IUserSignUp } from "../Types/User";
 
 interface UserState {
     user: IUserSignUp | null;
-    setUser: (user: IUserSignUp) => void;
+    setUser: (user: IUserSignUp | null) => void;
 }
 
 export const useUserStore = create<UserState>()(
     persist(
         (set) => ({
             user: null,
-            setUser: (user: IUserSignUp) => set({ user }),
+            setUser: (user) => set({ user }),
         }),
         {
             name: "user-storage",

@@ -1,11 +1,11 @@
 import { connectDB } from "@/lib/db";
 import { User } from "../MODELS/userModel";
-import { IUserFromDB, IUserLogin, IUserSignUp } from "../Types/User";
+import { IUserFromDB, IUserLogin } from "../Types/User";
 import bcrypt from "bcryptjs";
 
 export class UserService {
 
-    static async createUser(username: string, email: string, password: string): Promise<IUserSignUp | null> {
+    static async createUser(username: string, email: string, password: string): Promise<IUserFromDB | null> {
         await connectDB();
 
         const existingUser = await User.findOne({ email });
