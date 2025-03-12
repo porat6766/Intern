@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,9 +10,10 @@ import { useRouter } from "next/navigation";
 import useUserStore from "../../AppConfig/Store/userZustand";
 import { useEffect, useActionState } from "react";
 import { loginAction } from "../../AppConfig/actions/auth";
+import { signIn } from "next-auth/react";
 
-import { FcGoogle } from 'react-icons/fc';
-import { AiFillAmazonCircle } from 'react-icons/ai';
+import { FcGoogle } from "react-icons/fc";
+import { AiFillAmazonCircle } from "react-icons/ai";
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -37,6 +37,7 @@ const Login = () => {
         }
     }, [state.user, router, setUser]);
 
+
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100">
             <Card className="w-full max-w-sm shadow-lg">
@@ -59,7 +60,7 @@ const Login = () => {
                             <Button
                                 variant="outline"
                                 className="flex items-center gap-2"
-                            // onClick={() => signIn("google")}
+                                onClick={() => signIn("google", { callbackUrl: "/tasks" })}
                             >
                                 <FcGoogle />
                                 Google
