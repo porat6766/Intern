@@ -1,8 +1,8 @@
-import React from 'react';
 import Hero from '../../AppConfig/components/Hero';
 import Features from '../../AppConfig/components/Features';
 
 const Home = () => {
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <main className="flex-1">

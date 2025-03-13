@@ -1,8 +1,64 @@
+// import NextAuth from "next-auth";
+// import GoogleProvider from "next-auth/providers/google";
+// import { UserService } from "@/AppConfig/Services/UserService";
+
+// export const authOptions = {
+//     providers: [
+//         GoogleProvider({
+//             clientId: process.env.GOOGLE_CLIENT_ID!,
+//             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+//         }),
+//     ],
+//     callbacks: {
+//         async signIn({ user, account }) {
+//             if (account?.provider === "google") {
+//                 try {
+
+//                     let existingUser = await UserService.getUserByEmail(user.email!);
+
+//                     if (!existingUser) {
+
+//                         existingUser = await UserService.createUser(
+//                             user.name || user.email!.split('@')[0],
+//                             user.email!,
+//                             Math.random().toString(36).slice(-8)
+//                         );
+//                     }
+
+//                     return true;
+//                 } catch (error) {
+//                     console.error("Error during Google sign-in:", error);
+//                     return false;
+//                 }
+//             }
+//             return true;
+//         },
+//         async jwt({ token, user }) {
+//             if (user) {
+//                 token.id = user.id;
+//             }
+//             return token;
+//         },
+//         async session({ session, token }) {
+//             if (session.user) {
+//                 session.user.id = token.id;
+//             }
+//             return session;
+//         },
+//     },
+//     pages: {
+//         signIn: "/login",
+//         error: "/login",
+//     },
+// };
+
+// const handler = NextAuth(authOptions);
+// export { handler as GET, handler as POST };
+
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { UserService } from "@/AppConfig/Services/UserService";
-import { signJwt } from "@/utils/jwt";
-import { cookies } from "next/headers";
 
 export const authOptions = {
     providers: [
@@ -10,73 +66,96 @@ export const authOptions = {
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         }),
+        CredentialsProvider({
+            name: "Credentials",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                password: { label: "Password", type: "password" }
+            },
+            async authorize(credentials) {
+                if (!credentials?.email || !credentials?.password) {
+                    return null;
+                }
+
+                try {
+                    const user = await UserService.authenticateUser(
+                        credentials.email,
+                        credentials.password
+                    );
+
+                    if (user) {
+                        //
+                        return user;
+                    }
+                    return null;
+                } catch (error) {
+                    console.error("Error authenticating user:", error);
+                    return null;
+                }
+            }
+        }),
     ],
     callbacks: {
         async signIn({ user, account }) {
+
             if (account?.provider === "google") {
                 try {
-                    
-                    const existingUser = await UserService.getUserByEmail(user.email!);
+                    let existingUser = await UserService.getUserByEmail(user.email!);
 
-                    if (existingUser) {
-                        
-                        const token = signJwt({ id: existingUser._id, email: existingUser.email });
-
-                        
-                        const cookieStore = await cookies();
-                        cookieStore.set("token", token, {
-                            httpOnly: true,
-                            secure: process.env.NODE_ENV === "production",
-                            sameSite: "strict",
-                            path: "/",
-                            maxAge: 60 * 60 * 24 * 7, 
-                        });
-
-                        return true;
-                    } else {
-                        
-                        const newUser = await UserService.createUser(
-                            user.name || user.email!.split('@')[0], 
+                    if (!existingUser) {
+                        existingUser = await UserService.createUser(
+                            user.name || user.email!.split('@')[0],
                             user.email!,
-                            Math.random().toString(36).slice(-8) 
+                            Math.random().toString(36).slice(-8)
                         );
-
-                        if (newUser) {
-                            
-                            const token = signJwt({ id: newUser._id, email: newUser.email });
-
-                            
-                            const cookieStore = await cookies();
-                            cookieStore.set("token", token, {
-                                httpOnly: true,
-                                secure: process.env.NODE_ENV === "production",
-                                sameSite: "strict",
-                                path: "/",
-                                maxAge: 60 * 60 * 24 * 7, 
-                            });
-
-                            return true;
-                        }
                     }
+
+
+                    Object.assign(user, existingUser);
+                    return true;
                 } catch (error) {
                     console.error("Error during Google sign-in:", error);
                     return false;
                 }
             }
+
             return true;
         },
-        async jwt({ token, user }) {
+        async jwt({ token, user, account }) {
+
             if (user) {
-                token.id = user.id;
+
+                token = {
+                    ...token,
+                    ...user
+                };
+
+
+                if (account) {
+                    token.provider = account.provider;
+                }
             }
             return token;
         },
         async session({ session, token }) {
-            if (session.user) {
-                session.user.id = token.id;
+            //
+            session.user = {
+                ...session.user,
+                ...token
+            };
+
+
+            if (session.user.password) {
+                delete session.user.password;
             }
+
             return session;
         },
+    },
+
+    session: {
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60,
     },
     pages: {
         signIn: "/login",

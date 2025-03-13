@@ -21,9 +21,11 @@ export class UserService {
         return User.findById(userId);
     }
 
-    static async getUserByEmail(email: string): Promise<IUserLogin | null> {
+    static async getUserByEmail(email: string): Promise<IUserFromDB | null> {
         await connectDB();
-        return User.findOne({ email });
+        const user = await User.findOne({ email });
+        if (!user) return null;
+        return user
     }
 
     static async authenticateUser(email: string, password: string): Promise<IUserFromDB | null> {
