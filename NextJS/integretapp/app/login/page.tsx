@@ -15,7 +15,7 @@ import { FcGoogle } from "react-icons/fc";
 import { AiFillAmazonCircle } from "react-icons/ai";
 import { FaUserLock } from "react-icons/fa";
 
-// Validations schema
+
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters long"),
@@ -23,8 +23,8 @@ const loginSchema = z.object({
 
 const Login = () => {
     const router = useRouter();
-    // const { setUser } = useUserStore();
-    const [loginError, setLoginError] = useState(""); // State for handling login errors
+
+    const [loginError, setLoginError] = useState("");
 
     const {
         register,
@@ -34,9 +34,9 @@ const Login = () => {
         resolver: zodResolver(loginSchema),
     });
 
-    // Function to handle login
+
     const onCredentialsSubmit = handleSubmit(async (data) => {
-        setLoginError(""); // Reset error message before submitting
+        setLoginError("");
         const response = await signIn("credentials", {
             email: data.email,
             password: data.password,
