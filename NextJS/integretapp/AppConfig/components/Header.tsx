@@ -23,6 +23,7 @@ const Header = () => {
     const handleLogout = async () => {
         startTransition(async () => {
             await signOut({ redirect: false });
+            window.location.reload()
         });
     };
 
