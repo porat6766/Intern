@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "./authMiddleware/auth";
 
-export async function middleware(req: NextRequest) {
+export const middleware = auth(async (req: NextRequest) => {
     console.log("Middleware triggered for:", req.nextUrl.pathname);
 
-    const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
+    const session = req.auth?.session;
 
     if (session && req.nextUrl.pathname === "/login") {
         console.log("User is already logged in, redirecting to /tasks.");
         return NextResponse.redirect(new URL("/tasks", req.url));
     }
-
 
     if (!session && req.nextUrl.pathname !== "/login") {
         console.log("No session found, redirecting to login.");
@@ -20,12 +18,9 @@ export async function middleware(req: NextRequest) {
 
     console.log("Access granted:", req.nextUrl.pathname);
     return NextResponse.next();
-}
+});
+
 
 export const config = {
-    matcher: [
-        "/addTask",
-        "/tasks",
-        "/login",
-    ],
+    matcher: ["/addTask", "/tasks", "/login"],
 };
