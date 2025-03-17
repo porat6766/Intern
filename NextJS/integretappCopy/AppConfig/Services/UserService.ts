@@ -36,4 +36,13 @@ export class UserService {
         const isMatch = await bcrypt.compare(password, user.password);
         return isMatch ? user : null;
     }
+
+    static async authenticateUserAfterSignUp(email: string, password: string): Promise<IUserFromDB | null> {
+        await connectDB();
+        const user = await User.findOne({ email });
+        if (!user) return null;
+
+        const isMatch = password === user.password;
+        return isMatch ? user : null;
+    }
 }

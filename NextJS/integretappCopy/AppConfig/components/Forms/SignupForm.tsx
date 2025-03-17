@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -12,6 +11,8 @@ import { useEffect, useActionState, startTransition } from "react";
 import { signupAction } from "../../actions/auth";
 import { signIn } from "next-auth/react";
 import { signupSchema } from "../../ZOD/authZod";
+import { refreshHeader } from "@/utils/revalidatePath";
+import { ErrorMessage } from "../ErrorMessage";
 
 
 const SignUp = () => {
@@ -19,11 +20,9 @@ const SignUp = () => {
     const { setUser } = useUserStore();
     const [state, formAction] = useActionState(signupAction, {});
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({ resolver: zodResolver(signupSchema) });
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: zodResolver(signupSchema),
+    });
 
     useEffect(() => {
         if (state?.user) {
@@ -34,6 +33,7 @@ const SignUp = () => {
                     password: state.user.password,
                     redirect: false,
                 });
+                refreshHeader();
                 router.push("/tasks");
             });
         }
@@ -49,31 +49,34 @@ const SignUp = () => {
 
 
     return (
-        <Card className="w-full max-w-sm shadow-lg" >
+        <Card className="w-full max-w-sm shadow-lg">
             <CardHeader>
-                <CardTitle className="text-center" > Sign Up </CardTitle>
+                <CardTitle className="text-center">Sign Up</CardTitle>
             </CardHeader>
-            < CardContent >
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" >
+            <CardContent>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div>
                         <Input type="text" placeholder="Username" {...register("username")} />
-                        {errors.username && <p className="text-red-500 text-sm" > {errors.username.message} </p>}
+                        {errors.username && <ErrorMessage message={errors.username.message!} />}
                     </div>
-                    < div >
+                    <div>
                         <Input type="email" placeholder="Email" {...register("email")} />
-                        {errors.email && <p className="text-red-500 text-sm" > {errors.email.message} </p>}
+                        {errors.email && <ErrorMessage message={errors.email.message!} />}
                     </div>
-                    < div >
+                    <div>
                         <Input type="password" placeholder="Password" {...register("password")} />
-                        {errors.password && <p className="text-red-500 text-sm" > {errors.password.message} </p>}
+                        {errors.password && <ErrorMessage message={errors.password.message!} />}
                     </div>
-                    {state.error && <p className="text-red-500 text-sm" > {state.error} </p>}
-                    <Button type="submit" className="w-full" disabled={state.isLoading} >
+                    {state.error && <ErrorMessage message={state.error} />}
+                    <Button type="submit" className="w-full" disabled={state?.isLoading}>
                         {state.isLoading ? "Signing Up..." : "Sign Up"}
                     </Button>
-                    < p className="text-center mt-4 text-sm" >
-                        Already have an account ? {" "}
-                        < span onClick={() => router.push("/login")} className="text-blue-500 cursor-pointer" >
+                    <p className="text-center mt-4 text-sm">
+                        Already have an account?{" "}
+                        <span
+                            onClick={() => router.push("/login")}
+                            className="text-blue-500 cursor-pointer"
+                        >
                             Login here
                         </span>
                     </p>

@@ -21,21 +21,28 @@ export const authOptions = {
                 }
 
                 try {
-                    const user = await UserService.authenticateUser(
+
+                    let user = await UserService.authenticateUser(
                         credentials.email,
                         credentials.password
                     );
 
-                    if (user) {
-                        //
-                        return user;
+
+                    if (!user) {
+                        user = await UserService.authenticateUserAfterSignUp(
+                            credentials.email,
+                            credentials.password
+                        );
                     }
-                    return null;
+
+
+                    return user || null;
                 } catch (error) {
                     console.error("Error authenticating user:", error);
                     return null;
                 }
             }
+
         }),
     ],
     callbacks: {
@@ -81,7 +88,7 @@ export const authOptions = {
             return token;
         },
         async session({ session, token }) {
-            //
+
             session.user = {
                 ...session.user,
                 ...token
@@ -103,6 +110,7 @@ export const authOptions = {
     pages: {
         signIn: "/login",
         error: "/login",
+        signOut: "/custom-logout",
     },
 };
 

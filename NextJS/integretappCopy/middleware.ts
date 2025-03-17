@@ -22,5 +22,6 @@ export const middleware = auth(async (req: NextRequest) => {
 
 
 export const config = {
-    matcher: ["/addTask", "/tasks", "/login"],
+    matcher: ["/addTask", "/tasks", "/login", "/profile"],
+
 };

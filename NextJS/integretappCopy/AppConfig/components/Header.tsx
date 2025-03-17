@@ -1,11 +1,7 @@
-'use client'
-
-import { Button } from "../components/ui/button";
-import { User, ListChecks, PlusCircle, Award, Settings } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { startTransition } from "react";
-import { signOut } from "next-auth/react";
-import { useAuth } from "../hooks/auth";
+import Link from 'next/link';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../app/api/auth/[...nextauth]/route';
+import { Button } from '../components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,54 +9,35 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "../components/dropdown-menu";
+} from '../components/dropdown-menu';
+import { User, ListChecks, PlusCircle, Award, Settings } from 'lucide-react';
+import LogoutButton from './LogoutButton';
 
+const Header = async () => {
+    const session = await getServerSession(authOptions);
+    const user = session?.user;
 
-const Header = () => {
-    const { user, isLoading, isAuthenticated } = useAuth();
-    const router = useRouter();
-
-    const handleLogout = async () => {
-        startTransition(async () => {
-            await signOut({ redirect: false });
-            router.push("/");
-        });
-    };
-
+    const navItems = [
+        { label: 'All Tasks', icon: ListChecks, href: '/tasks' },
+        { label: 'Add Task', icon: PlusCircle, href: '/addTask' },
+    ];
 
     return (
         <header className="w-full py-4 px-6 bg-white shadow-sm border-b border-slate-200 animate-fade-in">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
-                <div className="flex items-center cursor-pointer" onClick={() => router.push("/")}>
-                    <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-                        IntegretApp
-                    </h1>
-                </div>
+                <Link href="/" className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+                    IntegretApp
+                </Link>
 
                 <nav className="flex items-center space-x-2 sm:space-x-4">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1 transition-all hover:bg-blue-50"
-                        onClick={() => router.push("/tasks")}
-                    >
-                        <ListChecks className="w-4 h-4 mr-1" />
-                        <span className="hidden sm:inline">All Tasks</span>
-                    </Button>
+                    {user && navItems.map(({ label, icon: Icon, href }) => (
+                        <Link key={href} href={href} className="flex items-center gap-1 px-3 py-1.5 border rounded-md transition hover:bg-gray-100">
+                            <Icon className="w-4 h-4 mr-1" />
+                            <span className="hidden sm:inline">{label}</span>
+                        </Link>
+                    ))}
 
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1 transition-all hover:bg-green-50"
-                        onClick={() => router.push("/addTask")}
-                    >
-                        <PlusCircle className="w-4 h-4 mr-1" />
-                        <span className="hidden sm:inline">Add Task</span>
-                    </Button>
-
-                    {isLoading ? (
-                        <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
-                    ) : user ? (
+                    {user ? (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <div className="flex items-center gap-2 cursor-pointer bg-gray-100 hover:bg-gray-200 rounded-md px-3 py-1.5 transition-colors">
@@ -79,42 +56,33 @@ const Header = () => {
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {user.role && (
-                                    <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                                    <DropdownMenuItem className="flex items-center gap-2">
                                         <Award className="w-4 h-4" />
                                         <span>Role: {user.role}</span>
                                     </DropdownMenuItem>
                                 )}
                                 {user.isAdmin && (
-                                    <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                                    <DropdownMenuItem className="flex items-center gap-2">
                                         <Settings className="w-4 h-4" />
                                         <span>Admin Dashboard</span>
                                     </DropdownMenuItem>
                                 )}
-                                <DropdownMenuItem
-                                    className="flex items-center gap-2 cursor-pointer"
-                                    onClick={() => router.push("/profile")}
-                                >
-                                    <User className="w-4 h-4" />
-                                    <span>Profile</span>
+                                <DropdownMenuItem className="flex items-center gap-2" asChild>
+                                    <Link href="/profile">
+                                        <User className="w-4 h-4" />
+                                        <span>Profile</span>
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    className="flex items-center gap-2 text-red-600 cursor-pointer"
-                                    onClick={handleLogout}
-                                >
-                                    <span>Logout</span>
-                                </DropdownMenuItem>
+                                <LogoutButton />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ) : (
-                        <Button
-                            variant="default"
-                            size="sm"
-                            className="bg-blue-600 hover:bg-blue-700 flex items-center gap-1"
-                            onClick={() => router.push("/login")}
-                        >
-                            <User className="w-4 h-4 mr-1" />
-                            <span className="hidden sm:inline cursor-pointer">Login</span>
+                        <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700 flex items-center gap-1">
+                            <Link href="/login" className="flex items-center gap-1">
+                                <User className="w-4 h-4 mr-1" />
+                                <span className="hidden sm:inline">Login</span>
+                            </Link>
                         </Button>
                     )}
                 </nav>

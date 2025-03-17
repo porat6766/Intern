@@ -13,6 +13,7 @@ import { FcGoogle } from "react-icons/fc";
 import { AiFillAmazonCircle } from "react-icons/ai";
 import { FaUserLock } from "react-icons/fa";
 import { loginSchema } from "@/AppConfig/ZOD/authZod";
+import { refreshHeader } from "@/utils/revalidatePath";
 
 const LoginForm = () => {
     const router = useRouter();
@@ -39,6 +40,7 @@ const LoginForm = () => {
         if (response?.error) {
             setLoginError("Invalid email or password. Please try again.");
         } else {
+            refreshHeader()
             router.push("/tasks");
         }
     });
