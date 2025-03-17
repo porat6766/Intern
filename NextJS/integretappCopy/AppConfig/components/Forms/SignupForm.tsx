@@ -7,46 +7,50 @@ import { Button } from "./../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./../ui/card";
 import { useRouter } from "next/navigation";
 import useUserStore from "../../Store/userZustand";
-import { useEffect, useActionState, startTransition } from "react";
 import { signupAction } from "../../actions/auth";
 import { signIn } from "next-auth/react";
 import { signupSchema } from "../../ZOD/authZod";
 import { refreshHeader } from "@/utils/revalidatePath";
 import { ErrorMessage } from "../ErrorMessage";
 
-
 const SignUp = () => {
     const router = useRouter();
     const { setUser } = useUserStore();
-    const [state, formAction] = useActionState(signupAction, {});
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const {
+        register,
+        handleSubmit,
+        setError,
+        formState: { errors, isSubmitting },
+    } = useForm({
         resolver: zodResolver(signupSchema),
     });
 
-    useEffect(() => {
-        if (state?.user) {
-            startTransition(async () => {
-                setUser(state.user);
-                await signIn("credentials", {
-                    email: state.user.email,
-                    password: state.user.password,
-                    redirect: false,
-                });
-                refreshHeader();
-                router.push("/tasks");
-            });
+    const onSubmit = handleSubmit(async (data) => {
+        const response = await signupAction(null, data);
+
+        if (response?.error) {
+            if (response.error.includes("email")) {
+                setError("email", { message: response.error });
+            } else if (response.error.includes("password")) {
+                setError("password", { message: response.error });
+            } else {
+                setError("root", { message: response.error });
+            }
+            return;
         }
-    }, [state.user, router, setUser]);
 
-    const onSubmit = async (data: any) => {
-        const plainPassword = data.password;
-
-        startTransition(() => {
-            formAction({ ...data, plainPassword });
-        });
-    };
-
+        if (response?.user) {
+            setUser(response.user);
+            await signIn("credentials", {
+                email: response.user.email,
+                password: data.password,
+                redirect: false,
+            });
+            refreshHeader();
+            router.push("/tasks");
+        }
+    });
 
     return (
         <Card className="w-full max-w-sm shadow-lg">
@@ -54,7 +58,7 @@ const SignUp = () => {
                 <CardTitle className="text-center">Sign Up</CardTitle>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={onSubmit} className="space-y-4">
                     <div>
                         <Input type="text" placeholder="Username" {...register("username")} />
                         {errors.username && <ErrorMessage message={errors.username.message!} />}
@@ -67,16 +71,13 @@ const SignUp = () => {
                         <Input type="password" placeholder="Password" {...register("password")} />
                         {errors.password && <ErrorMessage message={errors.password.message!} />}
                     </div>
-                    {state.error && <ErrorMessage message={state.error} />}
-                    <Button type="submit" className="w-full" disabled={state?.isLoading}>
-                        {state.isLoading ? "Signing Up..." : "Sign Up"}
+                    {errors.root && <ErrorMessage message={errors.root.message!} />}
+                    <Button type="submit" className="w-full" disabled={isSubmitting}>
+                        {isSubmitting ? "Signing Up..." : "Sign Up"}
                     </Button>
                     <p className="text-center mt-4 text-sm">
                         Already have an account?{" "}
-                        <span
-                            onClick={() => router.push("/login")}
-                            className="text-blue-500 cursor-pointer"
-                        >
+                        <span onClick={() => router.push("/login")} className="text-blue-500 cursor-pointer">
                             Login here
                         </span>
                     </p>
