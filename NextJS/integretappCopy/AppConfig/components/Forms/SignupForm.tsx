@@ -33,7 +33,7 @@ const SignUp = () => {
             if (response.error.includes("email")) {
                 setError("email", { message: response.error });
             } else if (response.error.includes("password")) {
-                setError("password", { message: response.error });
+                setError("password", { message: response.error });  
             } else {
                 setError("root", { message: response.error });
             }
