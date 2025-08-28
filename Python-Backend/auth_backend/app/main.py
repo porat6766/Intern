@@ -31,3 +31,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 @app.get("/protected")
 async def protected(token: str = Depends(oauth2_scheme)):
     return {"message": "This is a protected route", "token": token}
+
+
+# test
